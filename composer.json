@@ -2,7 +2,7 @@
     "name": "riso348/tyrion-pdo-orm",
     "autoload": {
         "psr-0" : {
-            "Tyrion\\SimpleOrm" : "src"
+            "TyrionCMS\\SimpleOrm" : "src"
         }
     }
 }

@@ -2,9 +2,9 @@
 
 include __DIR__ . "/autoloader.php";
 
-use Tyrion\SimpleOrm\DbStatement;
-use Tyrion\SimpleOrm\DbWrapper;
-use Tyrion\SimpleOrm\Example\Item\Car;
+use TyrionCMS\SimpleOrm\DbStatement;
+use TyrionCMS\SimpleOrm\DbWrapper;
+use TyrionCMS\SimpleOrm\Example\Item\Car;
 
 
 $config = array(
@@ -23,7 +23,7 @@ $cars = $dbStatement
     ->setRowItemInstance(new Car())
     ->setQuery("SELECT * FROM {$dbStatement->getModelTableName()}")->findResult();
 
-/** @var Tyrion\SimpleOrm\Example\Item\Car $car */
+/** @var TyrionCMS\SimpleOrm\Example\Item\Car $car */
 while($cars->hasNextItem()){
     $car = $cars->getNextItem();
     echo $car->getModel() . "<br/>";

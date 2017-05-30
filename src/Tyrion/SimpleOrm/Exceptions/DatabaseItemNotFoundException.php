@@ -1,4 +1,4 @@
-<?php namespace Tyrion\SimpleOrm\Exceptions;
+<?php namespace TyrionCMS\SimpleOrm\Exceptions;
 
 class DatabaseItemNotFoundException extends \Exception
 {

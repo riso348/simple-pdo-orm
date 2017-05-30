@@ -1,4 +1,4 @@
-<?php namespace Tyrion\SimpleOrm\Item;
+<?php namespace TyrionCMS\SimpleOrm\Item;
 
 
 abstract class AbstractModelItem

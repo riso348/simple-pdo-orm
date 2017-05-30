@@ -1,7 +1,7 @@
-<?php namespace Tyrion\SimpleOrm;
+<?php namespace TyrionCMS\SimpleOrm;
 
 
-use Tyrion\SimpleOrm\Item\DbTableRowItem;
+use TyrionCMS\SimpleOrm\Item\DbTableRowItem;
 
 class DbTableRowList
 {

@@ -1,10 +1,10 @@
-<?php namespace Tyrion\SimpleOrm;
+<?php namespace TyrionCMS\SimpleOrm;
 
 use Cms\CmsManager;
 use Middleware\CompanyValidator;
 use PDO;
 use PDOException;
-use Tyrion\SimpleOrm\Exceptions\WrongConfigParameterException;
+use TyrionCMS\SimpleOrm\Exceptions\WrongConfigParameterException;
 use TyrionApi\Application;
 use TyrionApi\Classes\Singleton;
 
@@ -12,7 +12,7 @@ use TyrionApi\Classes\Singleton;
  * Singleton Class DbWrapper
  * Database wrapper for external DB - Tyrion
  * This DB holds all necessary global information such as Permissions, Settings, Updates
- * @package Tyrion\SimpleOrm
+ * @package TyrionCMS\SimpleOrm
  */
 final class DbWrapper
 {

@@ -1,11 +1,11 @@
-<?php namespace Tyrion\SimpleOrm;
+<?php namespace TyrionCMS\SimpleOrm;
 
 
-use Tyrion\SimpleOrm\Exceptions\DatabaseItemNotFoundException;
-use Tyrion\SimpleOrm\Exceptions\DatabaseModelException;
-use Tyrion\SimpleOrm\Exceptions\DatabaseUpdateModelException;
-use Tyrion\SimpleOrm\Item\ClearPdoItem;
-use Tyrion\SimpleOrm\Item\DbTableRowItem;
+use TyrionCMS\SimpleOrm\Exceptions\DatabaseItemNotFoundException;
+use TyrionCMS\SimpleOrm\Exceptions\DatabaseModelException;
+use TyrionCMS\SimpleOrm\Exceptions\DatabaseUpdateModelException;
+use TyrionCMS\SimpleOrm\Item\ClearPdoItem;
+use TyrionCMS\SimpleOrm\Item\DbTableRowItem;
 
 final class DbStatement
 {

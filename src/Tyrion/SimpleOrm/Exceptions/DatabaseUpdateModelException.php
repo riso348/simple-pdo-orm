@@ -6,7 +6,7 @@
  * Time: 14:25
  */
 
-namespace Tyrion\SimpleOrm\Exceptions;
+namespace TyrionCMS\SimpleOrm\Exceptions;
 
 
 class DatabaseUpdateModelException extends \Exception

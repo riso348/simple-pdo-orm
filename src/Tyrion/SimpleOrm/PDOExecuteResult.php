@@ -1,4 +1,4 @@
-<?php namespace Tyrion\SimpleOrm;
+<?php namespace TyrionCMS\SimpleOrm;
 
 
 use PDOStatement;

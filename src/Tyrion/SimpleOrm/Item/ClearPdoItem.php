@@ -1,6 +1,6 @@
-<?php namespace Tyrion\SimpleOrm\Item;
+<?php namespace TyrionCMS\SimpleOrm\Item;
 
-use Tyrion\SimpleOrm\DbTableRowItem;
+use TyrionCMS\SimpleOrm\DbTableRowItem;
 
 class ClearPdoItem implements DbTableRowItem
 {

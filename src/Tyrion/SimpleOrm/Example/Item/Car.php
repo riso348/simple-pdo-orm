@@ -1,7 +1,7 @@
-<?php namespace Tyrion\SimpleOrm\Example\Item;
+<?php namespace TyrionCMS\SimpleOrm\Example\Item;
 
-use Tyrion\SimpleOrm\Item\AbstractModelItem;
-use Tyrion\SimpleOrm\Item\DbTableRowItem;
+use TyrionCMS\SimpleOrm\Item\AbstractModelItem;
+use TyrionCMS\SimpleOrm\Item\DbTableRowItem;
 
 class Car extends AbstractModelItem implements DbTableRowItem
 {
