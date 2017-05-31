@@ -20,6 +20,7 @@ $dbWrapper = new DbWrapper($config);                                // Create co
 
 $dbStatement = new DbStatement($dbWrapper->getConnection());        // get DB manager that run queries
 
+// SELECT all entities from `car` table
 $cars = $dbStatement
     ->setRowItemInstance(new Car())                                 // Set Class we want to generate using reflection form entities
     ->setQuery("SELECT * FROM {$dbStatement->getModelTableName()}") // set sql Query
@@ -29,6 +30,19 @@ while ($cars->hasNextItem()) {                                      // Iterate s
     $car = $cars->getNextItem();
     echo $car->getModel() . "<br/>";
 }
+
+// SELECT specific car entity
+$car = $dbStatement
+    ->setRowItemInstance(new Car())
+    ->setQuery("SELECT * FROM {$dbStatement->getModelTableName()} WHERE id = ?")
+    ->setArguments(array(1))
+    ->findOne();
+    
+// SELECT unspecified model item: ClearPDOItem
+$data = $dbStatement
+    ->setQuery("SELECT * FROM `car` WHERE `brand` LIKE '%?%'")
+    ->setArguments(array("Fiat"))
+    ->findResult()
 ```
 Car class:
 

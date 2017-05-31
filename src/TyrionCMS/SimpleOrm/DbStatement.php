@@ -17,6 +17,7 @@ final class DbStatement
     public function __construct(\PDO $connection)
     {
         $this->connection = $connection;
+        $this->rowItemInstance = new ClearPdoItem();
     }
 
     /**

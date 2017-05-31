@@ -29,3 +29,13 @@ while ($cars->hasNextItem()) {
     echo $car->getModel() . "<br/>";
 }
 
+$car = $dbStatement
+    ->setRowItemInstance(new Car())
+    ->setQuery("SELECT * FROM {$dbStatement->getModelTableName()} WHERE id = ?")
+    ->setArguments(array(1))
+    ->findOne();
+
+$data = $dbStatement
+    ->setQuery("SELECT * FROM `car` WHERE `brand` LIKE '%?%'")
+    ->setArguments(array("Fiat"))
+    ->findResult()
