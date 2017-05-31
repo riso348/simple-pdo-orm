@@ -2,7 +2,7 @@
     "name": "tyrion/simple-pdo-orm",
     "autoload": {
         "psr-4" : {
-            "TyrionCMS\\SimpleOrm" : "src/"
+            "TyrionCMS\\SimpleOrm\\" : "src/"
         }
     }
 }
