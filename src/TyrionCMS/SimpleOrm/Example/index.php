@@ -24,7 +24,7 @@ $cars = $dbStatement
     ->setQuery("SELECT * FROM {$dbStatement->getModelTableName()}")->findResult();
 
 /** @var TyrionCMS\SimpleOrm\Example\Item\Car $car */
-while($cars->hasNextItem()){
+while ($cars->hasNextItem()) {
     $car = $cars->getNextItem();
     echo $car->getModel() . "<br/>";
 }

@@ -39,7 +39,7 @@ class DbTableRowIterator
         $this->currentItem = 0;
     }
 
-    public function getTableList():DbTableRowList
+    public function getTableList(): DbTableRowList
     {
         return $this->itemList;
     }

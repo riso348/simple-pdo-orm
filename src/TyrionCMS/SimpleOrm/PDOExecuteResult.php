@@ -13,10 +13,11 @@ class PDOExecuteResult
         $this->result = $result;
         $this->statement = $statement;
     }
+
     /**
      * @return bool
      */
-    public function getResult():bool
+    public function getResult(): bool
     {
         return $this->result;
     }
@@ -25,11 +26,10 @@ class PDOExecuteResult
     /**
      * @return PDOStatement
      */
-    public function getStatement():PDOStatement
+    public function getStatement(): PDOStatement
     {
         return $this->statement;
     }
-
 
 
 }

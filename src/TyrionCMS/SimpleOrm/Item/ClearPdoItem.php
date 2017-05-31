@@ -1,7 +1,5 @@
 <?php namespace TyrionCMS\SimpleOrm\Item;
 
-use TyrionCMS\SimpleOrm\DbTableRowItem;
-
 class ClearPdoItem implements DbTableRowItem
 {
     private $id;
@@ -17,7 +15,7 @@ class ClearPdoItem implements DbTableRowItem
      */
     public function getData($key)
     {
-        if($key){
+        if ($key) {
             return (isset($this->data->$key)) ? $this->data->$key : null;
         }
         return $this->data;
