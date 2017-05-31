@@ -38,4 +38,4 @@ $car = $dbStatement
 $data = $dbStatement
     ->setQuery("SELECT * FROM `car` WHERE `brand` LIKE '%?%'")
     ->setArguments(array("Fiat"))
-    ->findResult()
+    ->findResult();
