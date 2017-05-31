@@ -1,8 +1,12 @@
 {
     "name": "tyrion/simple-pdo-orm",
+    "keywords": ["orm", "pdo", "tyrion"],
     "autoload": {
         "psr-0" : {
             "TyrionCMS\\SimpleOrm" : "src"
         }
+    },
+    "require": {
+        "php": ">=7.1.0"
     }
 }
