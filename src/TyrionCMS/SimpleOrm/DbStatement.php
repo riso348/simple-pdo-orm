@@ -96,7 +96,7 @@ final class DbStatement
 
     public function getLastInsertedId(): int
     {
-        return $this->database->getConnection()->lastInsertId();
+        return $this->connection->lastInsertId();
     }
 
     public function saveModelItem(DbTableRowItem $dbTableRowItem)
@@ -116,9 +116,10 @@ final class DbStatement
 
     }
 
-    public function getModelTableName(): String
+    public function getModelTableName(? DbTableRowItem $dbTableRowItem = null): String
     {
-        $reflectionObject = new \ReflectionObject($this->getRowItemInstance());
+
+        $reflectionObject = new \ReflectionObject($dbTableRowItem ? $dbTableRowItem : $this->getRowItemInstance());
         $db_table = $reflectionObject->getConstant("DB_TABLE");
         if ($db_table === false) {
             throw new DatabaseUpdateModelException("Unable to find model constant: DB_TABLE");
