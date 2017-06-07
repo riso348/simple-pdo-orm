@@ -102,7 +102,7 @@ final class DbStatement
     public function saveModelItem(DbTableRowItem $dbTableRowItem)
     {
         $reflectionObject = new \ReflectionObject($dbTableRowItem);
-        $db_table = $this->getModelTableName();
+        $db_table = $this->getModelTableName($dbTableRowItem);
         try {
             $dbTableRowItem->getId();
             $this->prepareUpdateModelItem($dbTableRowItem, $db_table, $reflectionObject);
