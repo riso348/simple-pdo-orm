@@ -5,19 +5,29 @@ include __DIR__ . "/autoloader.php";
 use TyrionCMS\SimpleOrm\DbStatement;
 use TyrionCMS\SimpleOrm\DbWrapper;
 use TyrionCMS\SimpleOrm\Example\Item\Car;
+use TyrionCMS\SimpleOrm\Example\Item\Product;
 
 
 $config = array(
     "db_host" => "localhost",
-    "db_password" => "",
+    "db_password" => "175174",
     "db_port" => "3306",
-    "db_name" => "example_database",
+    "db_name" => "asteel_dev",
     "db_username" => "root"
 );
 
 $dbWrapper = new DbWrapper($config);
 
 $dbStatement = new DbStatement($dbWrapper->getConnection());
+
+
+$products = $dbStatement
+    ->setRowItemInstance(new Product())
+    ->setQuery("SELECT * FROM {$dbStatement->getModelTableName()} LIMIT 10")->findResult();
+
+$products = $dbStatement
+    ->setRowItemInstance(new Product())->setCreateDynamicProperties(true) // Automatic generate properties by DB table
+    ->setQuery("SELECT * FROM {$dbStatement->getModelTableName()} LIMIT 10")->findResult();
 
 $cars = $dbStatement
     ->setRowItemInstance(new Car())

@@ -74,12 +74,15 @@ final class DbStatement
     {
         $obj = new \ReflectionObject($rowItem);
         $new_object = $obj->newInstance();
+        $obj_properties = array();
 
+        $result = (array)$result;
         foreach ($obj->getProperties() as $property) {
             $property->setAccessible(true);
             $property_name = $property->getName();
-            if (isset($result->$property_name)) {
-                $property->setValue($new_object, $result->$property_name);
+            $obj_properties[$property_name] = null;
+            if (array_key_exists($property_name , $result)) {
+                $property->setValue($new_object, $result[$property_name]);
             }
         }
 
@@ -95,17 +98,15 @@ final class DbStatement
             /** @var ClearPdoItem $field */
             foreach($tableFields as $field){
                 $field = $field->getData('Field');
-                try {
-                    $obj->getProperty($field);
-                } catch (\ReflectionException $e) {
-                    $new_object->$field = (isset($result->$field)) ? $result->$field : null;
+                if(!array_key_exists($field, $obj_properties)){
+                    $new_object->$field = (array_key_exists($field , $result)) ? $result[$field] : null;
                 }
             }
+
             if(isset($previousRowInstance)) {
                 $this->setRowItemInstance($previousRowInstance);
             }
         }
-
         return $new_object;
     }
 
