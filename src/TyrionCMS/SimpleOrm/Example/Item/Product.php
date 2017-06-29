@@ -7,4 +7,5 @@ use TyrionCMS\SimpleOrm\Item\DbTableRowItem;
 class Product extends AbstractModelItem implements DbTableRowItem
 {
     private const DB_TABLE = "product";
+    protected $id;
 }
