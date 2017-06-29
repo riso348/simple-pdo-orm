@@ -14,6 +14,7 @@ final class DbStatement
     private $arguments = null;
     private $rowItemInstance;
     private $create_dynamic_properties = false;
+    private $tableFields = array();
 
     public function __construct(\PDO $connection)
     {
@@ -83,9 +84,14 @@ final class DbStatement
         }
 
         if($this->isCreateDynamicProperties()){
-            $previousRowInstance = $this->getRowItemInstance();
-            $this->setRowItemInstance(new ClearPdoItem());
-            $tableFields = $this->setQuery("DESCRIBE product")->findResult()->getTableList()->getItems();
+            if(!array_key_exists($obj->getName(), $this->tableFields)) {
+                $previousRowInstance = $this->getRowItemInstance();
+                $this->setRowItemInstance(new ClearPdoItem());
+                $tableFields = $this->setQuery("DESCRIBE product")->findResult()->getTableList()->getItems();
+                $this->tableFields[$obj->getName()] = $tableFields;
+            }else{
+                $tableFields = $this->tableFields[$obj->getName()];
+            }
             /** @var ClearPdoItem $field */
             foreach($tableFields as $field){
                 $field = $field->getData('Field');
@@ -95,7 +101,9 @@ final class DbStatement
                     $new_object->$field = (isset($result->$field)) ? $result->$field : null;
                 }
             }
-            $this->setRowItemInstance($previousRowInstance);
+            if(isset($previousRowInstance)) {
+                $this->setRowItemInstance($previousRowInstance);
+            }
         }
 
         return $new_object;
