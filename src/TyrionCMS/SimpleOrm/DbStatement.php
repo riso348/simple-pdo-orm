@@ -13,6 +13,7 @@ final class DbStatement
     private $query;
     private $arguments = null;
     private $rowItemInstance;
+    private $create_dynamic_properties = false;
 
     public function __construct(\PDO $connection)
     {
@@ -80,6 +81,23 @@ final class DbStatement
                 $property->setValue($new_object, $result->$property_name);
             }
         }
+
+        if($this->isCreateDynamicProperties()){
+            $previousRowInstance = $this->getRowItemInstance();
+            $this->setRowItemInstance(new ClearPdoItem());
+            $tableFields = $this->setQuery("DESCRIBE product")->findResult()->getTableList()->getItems();
+            /** @var ClearPdoItem $field */
+            foreach($tableFields as $field){
+                $field = $field->getData('Field');
+                try {
+                    $obj->getProperty($field);
+                } catch (\ReflectionException $e) {
+                    $new_object->$field = (isset($result->$field)) ? $result->$field : null;
+                }
+            }
+            $this->setRowItemInstance($previousRowInstance);
+        }
+
         return $new_object;
     }
 
@@ -162,6 +180,12 @@ final class DbStatement
         return $this;
     }
 
+    public function setCreateDynamicProperties(bool $value)
+    {
+        $this->create_dynamic_properties = $value;
+        return $this;
+    }
+
     private function prepareCreateNewModelItem($dbTableRowItem, String $db_table, \ReflectionObject $reflectionObject)
     {
         $values = array();
@@ -186,6 +210,11 @@ final class DbStatement
         $sql .= " ) ";
         $this->setQuery($sql);
         $this->setArguments($values);
+    }
+
+    private function isCreateDynamicProperties():bool
+    {
+        return $this->create_dynamic_properties;
     }
 
 
