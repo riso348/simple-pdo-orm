@@ -140,14 +140,41 @@ final class DbStatement
         if ($result->getResult() !== true) {
             throw new DatabaseUpdateModelException("Unable to update model item: " . $result->getResult());
         }
+    }
 
+    public function deleteModelItem(DbTableRowItem $dbTableRowItem)
+    {
+        $db_table = $this->getModelTableName($dbTableRowItem);
+        try {
+            $dbTableRowItem->getId();
+            $sql = "DELETE FROM `{$db_table}` WHERE `id` = ?";
+            $this->setQuery($sql);
+            $this->setArguments(array($dbTableRowItem->getId()));
+        } catch (\TypeError $e) {
+            throw new DatabaseModelException("Unable to find primary_key ID.");
+        }
+        $result = $this->execute();
+        if ($result->getResult() !== true) {
+            throw new DatabaseUpdateModelException("Unable to update model item: " . $result->getResult());
+        }
     }
 
     public function getModelTableName(? DbTableRowItem $dbTableRowItem = null): String
     {
 
         $reflectionObject = new \ReflectionObject($dbTableRowItem ? $dbTableRowItem : $this->getRowItemInstance());
-        $db_table = $reflectionObject->getConstant("DB_TABLE");
+        if($reflectionObject instanceof ClearPdoItem){
+            try {
+                $db_table = $reflectionObject->getProperty('db_table');
+                if(strlen($db_table) < 1){
+                    throw new DatabaseUpdateModelException("ClearPdoItem db_table is empty.");
+                }
+            } catch (\ReflectionException $e) {
+                throw new DatabaseUpdateModelException("ClearPdoItem db_table is empty.");
+            }
+        }else {
+            $db_table = $reflectionObject->getConstant("DB_TABLE");
+        }
         if ($db_table === false) {
             throw new DatabaseUpdateModelException("Unable to find model constant: DB_TABLE");
         }
@@ -159,7 +186,19 @@ final class DbStatement
 
         $values = array();
         $sql = "UPDATE `{$db_table}` SET ";
-        foreach ($reflectionObject->getProperties() as $property) {
+
+        $temp_reflection_class = $reflectionObject;
+        $properties = array();
+        while($temp_reflection_class instanceof \ReflectionClass){
+            foreach($temp_reflection_class->getProperties() as $property){
+                if(!array_key_exists($property->getName() , $properties)){
+                    $properties[$property->getName()] = $property;
+                }
+            }
+            $temp_reflection_class = $temp_reflection_class->getParentClass();
+        }
+
+        foreach ($properties as $property) {
             if ($property->getName() != 'id') {
                 $property->setAccessible(true);
                 $value = $property->getValue($dbTableRowItem);
@@ -199,7 +238,19 @@ final class DbStatement
     {
         $values = array();
         $sql = "INSERT INTO `{$db_table}` (";
-        foreach ($reflectionObject->getProperties() as $property) {
+
+        $temp_reflection_class = $reflectionObject;
+        $properties = array();
+        while($temp_reflection_class instanceof \ReflectionClass){
+            foreach($temp_reflection_class->getProperties() as $property){
+                if(!array_key_exists($property->getName() , $properties)){
+                    $properties[$property->getName()] = $property;
+                }
+            }
+            $temp_reflection_class = $temp_reflection_class->getParentClass();
+        }
+
+        foreach ($properties as $property) {
             if ($property->getName() != 'id') {
                 $property->setAccessible(true);
                 $value = $property->getValue($dbTableRowItem);

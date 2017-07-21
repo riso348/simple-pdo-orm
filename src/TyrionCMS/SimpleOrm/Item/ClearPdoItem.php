@@ -4,6 +4,7 @@ class ClearPdoItem implements DbTableRowItem
 {
     private $id;
     private $data;
+    private $db_table = null;
 
     public function getId(): int
     {
@@ -29,5 +30,12 @@ class ClearPdoItem implements DbTableRowItem
         $this->data = $data;
     }
 
+    /**
+     * @param null $db_table
+     */
+    public function setDbTable($db_table)
+    {
+        $this->db_table = $db_table;
+    }
 
 }
