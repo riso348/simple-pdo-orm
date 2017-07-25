@@ -77,7 +77,8 @@ final class DbStatement
         $obj_properties = array();
 
         $result = (array)$result;
-        foreach ($obj->getProperties() as $property) {
+
+        foreach ($this->generateRecursiveProperties($obj) as $property) {
             $property->setAccessible(true);
             $property_name = $property->getName();
             $obj_properties[$property_name] = null;
@@ -187,18 +188,7 @@ final class DbStatement
         $values = array();
         $sql = "UPDATE `{$db_table}` SET ";
 
-        $temp_reflection_class = $reflectionObject;
-        $properties = array();
-        while($temp_reflection_class instanceof \ReflectionClass){
-            foreach($temp_reflection_class->getProperties() as $property){
-                if(!array_key_exists($property->getName() , $properties)){
-                    $properties[$property->getName()] = $property;
-                }
-            }
-            $temp_reflection_class = $temp_reflection_class->getParentClass();
-        }
-
-        foreach ($properties as $property) {
+        foreach ($this->generateRecursiveProperties($reflectionObject) as $property) {
             if ($property->getName() != 'id') {
                 $property->setAccessible(true);
                 $value = $property->getValue($dbTableRowItem);
@@ -238,19 +228,8 @@ final class DbStatement
     {
         $values = array();
         $sql = "INSERT INTO `{$db_table}` (";
-
-        $temp_reflection_class = $reflectionObject;
-        $properties = array();
-        while($temp_reflection_class instanceof \ReflectionClass){
-            foreach($temp_reflection_class->getProperties() as $property){
-                if(!array_key_exists($property->getName() , $properties)){
-                    $properties[$property->getName()] = $property;
-                }
-            }
-            $temp_reflection_class = $temp_reflection_class->getParentClass();
-        }
-
-        foreach ($properties as $property) {
+        
+        foreach ($this->generateRecursiveProperties($reflectionObject) as $property) {
             if ($property->getName() != 'id') {
                 $property->setAccessible(true);
                 $value = $property->getValue($dbTableRowItem);
@@ -277,5 +256,22 @@ final class DbStatement
         return $this->create_dynamic_properties;
     }
 
+    /**
+     * @param \ReflectionObject $obj
+     * @return array
+     */
+    private function generateRecursiveProperties(\ReflectionObject $obj):array{
+        $temp_reflection_class = $obj;
+        $properties = array();
+        while($temp_reflection_class instanceof \ReflectionClass){
+            foreach($temp_reflection_class->getProperties() as $property){
+                if(!array_key_exists($property->getName() , $properties)){
+                    $properties[$property->getName()] = $property;
+                }
+            }
+            $temp_reflection_class = $temp_reflection_class->getParentClass();
+        }
+        return $properties;
+    }
 
 }
