@@ -56,6 +56,11 @@ class Car implements DbTableRowItem
     private $year_of_production;
     private $price;
     private $model;
+    /**
+     * Support for property annotation for ignore unrelated columns
+     * @tyrion-orm-ignore
+    */
+    private $test;
 
     public function getId():int
     {
