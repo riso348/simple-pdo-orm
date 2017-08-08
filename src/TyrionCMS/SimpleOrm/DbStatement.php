@@ -9,6 +9,7 @@ use TyrionCMS\SimpleOrm\Item\DbTableRowItem;
 
 final class DbStatement
 {
+    const IGNORE_PROPERTY_ANNOTATION = 'tyrion-orm-ignore';
     private $connection;
     private $query;
     private $arguments = null;
@@ -265,13 +266,25 @@ final class DbStatement
         $properties = array();
         while($temp_reflection_class instanceof \ReflectionClass){
             foreach($temp_reflection_class->getProperties() as $property){
-                if(!array_key_exists($property->getName() , $properties)){
+                $annotations = $this->getPropertyAnnotations($property);
+                if(!array_key_exists($property->getName() , $properties) && !array_key_exists(self::IGNORE_PROPERTY_ANNOTATION , $annotations)){
                     $properties[$property->getName()] = $property;
                 }
             }
             $temp_reflection_class = $temp_reflection_class->getParentClass();
         }
         return $properties;
+    }
+
+    private function getPropertyAnnotations(\ReflectionProperty $property): array
+    {
+        $doc = $property->getDocComment();
+        preg_match_all('#@(.*?)\n#s', $doc, $annotations);
+        $clear_annotations = array();
+        foreach(($annotations[1] ?? array()) as $annotation){
+            $clear_annotations[$annotation] = null;
+        }
+        return $clear_annotations;
     }
 
 }
