@@ -16,6 +16,7 @@ final class DbStatement
     private $rowItemInstance;
     private $create_dynamic_properties = false;
     private $tableFields = array();
+    private $transactionCounter;
 
     public function __construct(\PDO $connection)
     {
@@ -33,6 +34,45 @@ final class DbStatement
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function beginTransaction():bool
+    {
+        if (!$this->transactionCounter++) {
+            return $this->connection->beginTransaction();
+        }
+        $this->connection->exec('SAVEPOINT trans'.$this->transactionCounter);
+        return $this->transactionCounter >= 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function commitTransaction():bool
+    {
+        if (!--$this->transactionCounter) {
+            return $this->connection->commit();
+        }
+        return $this->transactionCounter >= 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function rollbackTransaction(): ? bool
+    {
+        if (--$this->transactionCounter) {
+            $this->connection->exec('ROLLBACK TO trans '. $this->transactionCounter + 1);
+            return true;
+        }
+        return $this->connection->rollback();
+    }
+
+    /**
+     * @return DbTableRowIterator
+     * @throws DatabaseModelException
+     */
     public function findResult(): DbTableRowIterator
     {
         $stmt = $this->execute()->getStatement();
@@ -50,6 +90,9 @@ final class DbStatement
         return $rowListIterator;
     }
 
+    /**
+     * @return PDOExecuteResult
+     */
     public function execute(): PDOExecuteResult
     {
         $stmt = $this->connection->prepare($this->query);
@@ -58,6 +101,10 @@ final class DbStatement
         return $dbResult;
     }
 
+    /**
+     * @return DbTableRowItem
+     * @throws DatabaseModelException
+     */
     private function getRowItemInstance(): DbTableRowItem
     {
         try {
@@ -71,6 +118,12 @@ final class DbStatement
         return $instance;
     }
 
+    /**
+     * @param $result
+     * @param DbTableRowItem $rowItem
+     * @return DbTableRowItem
+     * @throws DatabaseModelException
+     */
     private function generateTableRowItem($result, DbTableRowItem $rowItem): DbTableRowItem
     {
         $obj = new \ReflectionObject($rowItem);
@@ -112,6 +165,11 @@ final class DbStatement
         return $new_object;
     }
 
+    /**
+     * @return null|DbTableRowItem
+     * @throws DatabaseItemNotFoundException
+     * @throws DatabaseModelException
+     */
     public function findOne(): ? DbTableRowItem
     {
         $stmt = $this->execute()->getStatement();
@@ -123,11 +181,19 @@ final class DbStatement
         return $row;
     }
 
+    /**
+     * @return int
+     */
     public function getLastInsertedId(): int
     {
         return $this->connection->lastInsertId();
     }
 
+    /**
+     * @param DbTableRowItem $dbTableRowItem
+     * @throws DatabaseUpdateModelException
+     * @throws DatabaseModelException
+     */
     public function saveModelItem(DbTableRowItem $dbTableRowItem)
     {
         $reflectionObject = new \ReflectionObject($dbTableRowItem);
@@ -144,7 +210,12 @@ final class DbStatement
         }
     }
 
-    public function deleteModelItem(DbTableRowItem $dbTableRowItem)
+    /**
+     * @param DbTableRowItem $dbTableRowItem
+     * @throws DatabaseModelException
+     * @throws DatabaseUpdateModelException
+     */
+    public function deleteModelItem(DbTableRowItem $dbTableRowItem):void
     {
         $db_table = $this->getModelTableName($dbTableRowItem);
         try {
@@ -161,6 +232,12 @@ final class DbStatement
         }
     }
 
+    /**
+     * @param null|DbTableRowItem $dbTableRowItem
+     * @return String
+     * @throws DatabaseModelException
+     * @throws DatabaseUpdateModelException
+     */
     public function getModelTableName(? DbTableRowItem $dbTableRowItem = null): String
     {
 
@@ -183,7 +260,12 @@ final class DbStatement
         return $db_table;
     }
 
-    private function prepareUpdateModelItem($dbTableRowItem, String $db_table, \ReflectionObject $reflectionObject)
+    /**
+     * @param $dbTableRowItem
+     * @param String $db_table
+     * @param \ReflectionObject $reflectionObject
+     */
+    private function prepareUpdateModelItem($dbTableRowItem, String $db_table, \ReflectionObject $reflectionObject):void
     {
 
         $values = array();
@@ -207,25 +289,42 @@ final class DbStatement
         $this->setArguments($values);
     }
 
+    /**
+     * @param String $query
+     * @return $this
+     */
     public function setQuery(String $query)
     {
         $this->query = $query;
         return $this;
     }
 
+    /**
+     * @param array $arg
+     * @return $this
+     */
     public function setArguments(array $arg)
     {
         $this->arguments = $arg;
         return $this;
     }
 
+    /**
+     * @param bool $value
+     * @return $this
+     */
     public function setCreateDynamicProperties(bool $value)
     {
         $this->create_dynamic_properties = $value;
         return $this;
     }
 
-    private function prepareCreateNewModelItem($dbTableRowItem, String $db_table, \ReflectionObject $reflectionObject)
+    /**
+     * @param $dbTableRowItem
+     * @param String $db_table
+     * @param \ReflectionObject $reflectionObject
+     */
+    private function prepareCreateNewModelItem($dbTableRowItem, String $db_table, \ReflectionObject $reflectionObject):void
     {
         $values = array();
         $sql = "INSERT INTO `{$db_table}` (";
@@ -252,6 +351,9 @@ final class DbStatement
         $this->setArguments($values);
     }
 
+    /**
+     * @return bool
+     */
     private function isCreateDynamicProperties():bool
     {
         return $this->create_dynamic_properties;
@@ -276,6 +378,10 @@ final class DbStatement
         return $properties;
     }
 
+    /**
+     * @param \ReflectionProperty $property
+     * @return array
+     */
     private function getPropertyAnnotations(\ReflectionProperty $property): array
     {
         $doc = $property->getDocComment();
