@@ -17,6 +17,7 @@ final class DbStatement
     private $create_dynamic_properties = false;
     private $tableFields = array();
     private $transactionCounter;
+    private $primaryKeyColumn = "id";
 
     public function __construct(\PDO $connection)
     {
@@ -272,7 +273,7 @@ final class DbStatement
         $sql = "UPDATE `{$db_table}` SET ";
 
         foreach ($this->generateRecursiveProperties($reflectionObject) as $property) {
-            if ($property->getName() != 'id') {
+            if ($property->getName() != $this->getPrimaryKeyColumn()) {
                 $property->setAccessible(true);
                 $value = $property->getValue($dbTableRowItem);
                 if ($value instanceof \DateTime) {
@@ -283,7 +284,7 @@ final class DbStatement
             }
         }
         $sql = rtrim($sql, ' , ');
-        $sql .= " WHERE `id` = ?";
+        $sql .= " WHERE `{$this->getPrimaryKeyColumn()}` = ?";
         $values[] = $dbTableRowItem->getId();
         $this->setQuery($sql);
         $this->setArguments($values);
@@ -391,6 +392,21 @@ final class DbStatement
             $clear_annotations[$annotation] = null;
         }
         return $clear_annotations;
+    }
+
+    private function getPrimaryKeyColumn():string
+    {
+        return $this->primaryKeyColumn;
+    }
+
+    /**
+     * @param string $primaryKeyColumn
+     * @return DbStatement
+     */
+    public function setPrimaryKeyColumn(string $primaryKeyColumn): DbStatement
+    {
+        $this->primaryKeyColumn = $primaryKeyColumn;
+        return $this;
     }
 
 }
