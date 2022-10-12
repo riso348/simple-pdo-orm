@@ -98,6 +98,7 @@ final class DbStatement
     {
         $stmt = $this->connection->prepare($this->query);
         $result = $stmt->execute($this->arguments);
+        $this->setArguments([]);
         $dbResult = new PDOExecuteResult($stmt, $result);
         return $dbResult;
     }
