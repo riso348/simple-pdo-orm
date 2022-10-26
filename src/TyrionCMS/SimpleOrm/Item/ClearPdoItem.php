@@ -4,7 +4,7 @@ class ClearPdoItem implements DbTableRowItem
 {
     private $id;
     private array $data;
-    private string $db_table = null;
+    private string|null $db_table = null;
 
     public function getId(): int
     {
@@ -14,7 +14,7 @@ class ClearPdoItem implements DbTableRowItem
     /**
      * @return mixed
      */
-    public function getData(? string $key)
+    public function getData(?string $key)
     {
         if ($key) {
             return (isset($this->data->$key)) ? $this->data->$key : null;
