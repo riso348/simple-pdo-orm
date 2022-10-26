@@ -14,7 +14,7 @@ class ClearPdoItem implements DbTableRowItem
     /**
      * @return mixed
      */
-    public function getData(?string $key)
+    public function getData(?string $key = null)
     {
         if ($key) {
             return (isset($this->data->$key)) ? $this->data->$key : null;
