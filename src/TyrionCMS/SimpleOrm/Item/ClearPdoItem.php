@@ -3,7 +3,7 @@
 class ClearPdoItem implements DbTableRowItem
 {
     private $id;
-    private array $data;
+    private array $data = [];
     private string|null $db_table = null;
 
     public function getId(): int
