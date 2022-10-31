@@ -83,7 +83,7 @@ final class DbStatement
                 $rowList->addItem($this->generateTableRowItem($result, $this->getRowItemInstance()));
             } else {
                 $clearDbItem = new ClearPdoItem();
-                $clearDbItem->setData($result);
+                $clearDbItem->setData((array)$result);
                 $rowList->addItem($clearDbItem);
             }
         }
