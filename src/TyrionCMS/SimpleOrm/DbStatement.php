@@ -38,19 +38,19 @@ final class DbStatement
     /**
      * @return bool
      */
-    public function beginTransaction():bool
+    public function beginTransaction(): bool
     {
         if (!$this->transactionCounter++) {
             return $this->connection->beginTransaction();
         }
-        $this->connection->exec('SAVEPOINT trans'.$this->transactionCounter);
+        $this->connection->exec('SAVEPOINT trans' . $this->transactionCounter);
         return $this->transactionCounter >= 0;
     }
 
     /**
      * @return bool
      */
-    public function commitTransaction():bool
+    public function commitTransaction(): bool
     {
         if (!--$this->transactionCounter) {
             return $this->connection->commit();
@@ -61,10 +61,10 @@ final class DbStatement
     /**
      * @return bool
      */
-    public function rollbackTransaction(): ? bool
+    public function rollbackTransaction(): ?bool
     {
         if (--$this->transactionCounter) {
-            $this->connection->exec('ROLLBACK TO trans '. $this->transactionCounter + 1);
+            $this->connection->exec('ROLLBACK TO trans ' . $this->transactionCounter + 1);
             return true;
         }
         return $this->connection->rollback();
@@ -138,18 +138,18 @@ final class DbStatement
             $property->setAccessible(true);
             $property_name = $property->getName();
             $obj_properties[$property_name] = null;
-            if (array_key_exists($property_name , $result)) {
+            if (array_key_exists($property_name, $result)) {
                 $property->setValue($new_object, $result[$property_name]);
             }
         }
 
-        if($this->isCreateDynamicProperties()){
-            if(!array_key_exists($obj->getName(), $this->tableFields)) {
+        if ($this->isCreateDynamicProperties()) {
+            if (!array_key_exists($obj->getName(), $this->tableFields)) {
                 $previousRowInstance = $this->getRowItemInstance();
                 $this->setRowItemInstance(new ClearPdoItem());
-                $tableFields = $this->setQuery("DESCRIBE product")->findResult()->getTableList()->getItems();
+                $tableFields = $this->setQuery("DESCRIBE {$this->getModelTableName($new_object)}")->findResult()->getTableList()->getItems();
                 $this->tableFields[$obj->getName()] = $tableFields;
-            }else{
+            } else {
                 $tableFields = $this->tableFields[$obj->getName()];
             }
 
@@ -165,12 +165,12 @@ final class DbStatement
                         $property->setAccessible(true);
                         $property->setValue($new_object, array_key_exists($field, $result) ? $result[$field] : null);
                     } else {
-                        $new_object->$field = array_key_exists($field, $result) ? $result[$field] : null;
+                        @$new_object->$field = array_key_exists($field, $result) ? $result[$field] : null;
                     }
                 }
             }
 
-            if(isset($previousRowInstance)) {
+            if (isset($previousRowInstance)) {
                 $this->setRowItemInstance($previousRowInstance);
             }
         }
@@ -182,7 +182,7 @@ final class DbStatement
      * @throws DatabaseItemNotFoundException
      * @throws DatabaseModelException
      */
-    public function findOne(): ? DbTableRowItem
+    public function findOne(): ?DbTableRowItem
     {
         $stmt = $this->execute()->getStatement();
         $row = $stmt->fetchObject();
@@ -227,7 +227,7 @@ final class DbStatement
      * @throws DatabaseModelException
      * @throws DatabaseUpdateModelException
      */
-    public function deleteModelItem(DbTableRowItem $dbTableRowItem):void
+    public function deleteModelItem(DbTableRowItem $dbTableRowItem): void
     {
         $db_table = $this->getModelTableName($dbTableRowItem);
         try {
@@ -250,20 +250,20 @@ final class DbStatement
      * @throws DatabaseModelException
      * @throws DatabaseUpdateModelException
      */
-    public function getModelTableName(? DbTableRowItem $dbTableRowItem = null): String
+    public function getModelTableName(?DbTableRowItem $dbTableRowItem = null): string
     {
 
         $reflectionObject = new \ReflectionObject($dbTableRowItem ? $dbTableRowItem : $this->getRowItemInstance());
-        if($reflectionObject instanceof ClearPdoItem){
+        if ($reflectionObject instanceof ClearPdoItem) {
             try {
                 $db_table = $reflectionObject->getProperty('db_table');
-                if(strlen($db_table) < 1){
+                if (strlen($db_table) < 1) {
                     throw new DatabaseUpdateModelException("ClearPdoItem db_table is empty.");
                 }
             } catch (\ReflectionException $e) {
                 throw new DatabaseUpdateModelException("ClearPdoItem db_table is empty.");
             }
-        }else {
+        } else {
             $db_table = $reflectionObject->getConstant("DB_TABLE");
         }
         if ($db_table === false) {
@@ -277,7 +277,7 @@ final class DbStatement
      * @param String $db_table
      * @param \ReflectionObject $reflectionObject
      */
-    private function prepareUpdateModelItem($dbTableRowItem, String $db_table, \ReflectionObject $reflectionObject):void
+    private function prepareUpdateModelItem($dbTableRowItem, string $db_table, \ReflectionObject $reflectionObject): void
     {
 
         $values = array();
@@ -305,7 +305,7 @@ final class DbStatement
      * @param String $query
      * @return $this
      */
-    public function setQuery(String $query)
+    public function setQuery(string $query)
     {
         $this->query = $query;
         return $this;
@@ -336,11 +336,11 @@ final class DbStatement
      * @param String $db_table
      * @param \ReflectionObject $reflectionObject
      */
-    private function prepareCreateNewModelItem($dbTableRowItem, String $db_table, \ReflectionObject $reflectionObject):void
+    private function prepareCreateNewModelItem($dbTableRowItem, string $db_table, \ReflectionObject $reflectionObject): void
     {
         $values = array();
         $sql = "INSERT INTO `{$db_table}` (";
-        
+
         foreach ($this->generateRecursiveProperties($reflectionObject) as $property) {
             if ($property->getName() != 'id') {
                 $property->setAccessible(true);
@@ -366,7 +366,7 @@ final class DbStatement
     /**
      * @return bool
      */
-    private function isCreateDynamicProperties():bool
+    private function isCreateDynamicProperties(): bool
     {
         return $this->create_dynamic_properties;
     }
@@ -375,13 +375,14 @@ final class DbStatement
      * @param \ReflectionObject $obj
      * @return array
      */
-    private function generateRecursiveProperties(\ReflectionObject $obj):array{
+    private function generateRecursiveProperties(\ReflectionObject $obj): array
+    {
         $temp_reflection_class = $obj;
         $properties = array();
-        while($temp_reflection_class instanceof \ReflectionClass){
-            foreach($temp_reflection_class->getProperties() as $property){
+        while ($temp_reflection_class instanceof \ReflectionClass) {
+            foreach ($temp_reflection_class->getProperties() as $property) {
                 $annotations = $this->getPropertyAnnotations($property);
-                if(!array_key_exists($property->getName() , $properties) && !array_key_exists(self::IGNORE_PROPERTY_ANNOTATION , $annotations)){
+                if (!array_key_exists($property->getName(), $properties) && !array_key_exists(self::IGNORE_PROPERTY_ANNOTATION, $annotations)) {
                     $properties[$property->getName()] = $property;
                 }
             }
@@ -399,13 +400,13 @@ final class DbStatement
         $doc = $property->getDocComment();
         preg_match_all('#@(.*?)\n#s', $doc, $annotations);
         $clear_annotations = array();
-        foreach(($annotations[1] ?? array()) as $annotation){
+        foreach (($annotations[1] ?? array()) as $annotation) {
             $clear_annotations[$annotation] = null;
         }
         return $clear_annotations;
     }
 
-    private function getPrimaryKeyColumn():string
+    private function getPrimaryKeyColumn(): string
     {
         return $this->primaryKeyColumn;
     }
