@@ -152,11 +152,21 @@ final class DbStatement
             }else{
                 $tableFields = $this->tableFields[$obj->getName()];
             }
+
             /** @var ClearPdoItem $field */
-            foreach($tableFields as $field){
-                $field = $field->getData('Field');
-                if(!array_key_exists($field, $obj_properties)){
-                    $new_object->$field = (array_key_exists($field , $result)) ? $result[$field] : null;
+            $newObjectClass = new \ReflectionClass($new_object);
+            $obj_properties = get_object_vars($new_object); // Získanie existujúcich vlastností objektu
+
+            foreach ($tableFields as $fieldObj) {
+                $field = $fieldObj->getData('Field');
+                if (!array_key_exists($field, $obj_properties)) {
+                    if ($newObjectClass->hasProperty($field)) {
+                        $property = $newObjectClass->getProperty($field);
+                        $property->setAccessible(true);
+                        $property->setValue($new_object, array_key_exists($field, $result) ? $result[$field] : null);
+                    } else {
+                        $new_object->$field = array_key_exists($field, $result) ? $result[$field] : null;
+                    }
                 }
             }
 
